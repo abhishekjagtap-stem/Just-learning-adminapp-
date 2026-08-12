@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+:root {
+  --background: #f8f8ff;
+  --foreground: #2a1f3d;
+  --card: #ffffff;
+  --card-foreground: #2a1f3d;
+  --popover: #ffffff;
+  --popover-foreground: #2a1f3d;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #f3edff;
+  --secondary-foreground: #6d28d9;
+  --muted: #faf7ff;
+  --muted-foreground: #7c7488;
+  --accent: #f5f0ff;
+  --accent-foreground: #7c3aed;
+  --destructive: #c2413b;
+  --border: #ebe3f5;
+  --input: #e5d9f2;
+  --ring: #a78bfa;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: #171221;
+  --foreground: #f7f2ff;
+  --card: #20182d;
+  --card-foreground: #f7f2ff;
+  --popover: #2a203a;
+  --popover-foreground: #f7f2ff;
+  --primary: #a78bfa;
+  --primary-foreground: #211638;
+  --secondary: #302343;
+  --secondary-foreground: #ddd1ff;
+  --muted: #292036;
+  --muted-foreground: #aea3bd;
+  --accent: #352647;
+  --accent-foreground: #e8ddff;
+  --destructive: #f87171;
+  --border: #3c304d;
+  --input: #443654;
+  --ring: #a78bfa;
+}
+
+@theme inline {
+  --font-sans: "Geist Variable", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { @apply font-sans; }
+  body { @apply m-0 bg-background text-foreground antialiased; }
+  button, input { font: inherit; }
+}
+
+#root { min-height: 100svh; }
