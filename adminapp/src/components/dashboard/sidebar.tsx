@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, CircleHelp, HandHeart, LayoutDashboard, LogOut, Settings, ShieldCheck, Users, WalletCards } from "lucide-react"
+import { ChevronLeft, ChevronRight, CircleHelp, HandHeart, LayoutDashboard, LogOut, Radio, Settings, ShieldCheck, Users, WalletCards } from "lucide-react"
 import { Brand } from "@/components/brand"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -7,6 +7,7 @@ import { navigateTo } from "@/lib/navigation"
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" as const },
   { label: "Users", icon: Users, path: "/users" as const },
+  { label: "Podcasts", icon: Radio, path: "/podcasts" as const },
   { label: "Funds", icon: WalletCards },
   { label: "Donations", icon: HandHeart },
   { label: "Parent Consent", icon: ShieldCheck },

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { DashboardPage } from "@/pages/dashboard-page"
 import { LoginPage } from "@/pages/login-page"
 import { UsersPage } from "@/pages/users-page"
+import { PodcastsPage } from "@/pages/podcasts-page"
+import { PodcastDetailPage } from "@/pages/podcast-detail-page"
 import { Toaster } from "@/components/ui/toast"
 
 function App() {
@@ -18,7 +20,19 @@ function App() {
     }
   }, [])
 
-  const page = path === "/dashboard" ? <DashboardPage /> : path === "/users" ? <UsersPage /> : <LoginPage />
+  const podcastMatch = path.match(/^\/podcasts\/(\d+)$/)
+  const podcastId = podcastMatch ? Number(podcastMatch[1]) : null
+
+  const page =
+    podcastId !== null
+      ? <PodcastDetailPage podcastId={podcastId} />
+      : path === "/dashboard"
+      ? <DashboardPage />
+      : path === "/users"
+      ? <UsersPage />
+      : path === "/podcasts"
+      ? <PodcastsPage />
+      : <LoginPage />
   return <Toaster>{page}</Toaster>
 }
 

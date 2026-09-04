@@ -9,7 +9,7 @@ function endpoint(path: string) {
 }
 
 type RequestOptions = {
-  method?: "GET" | "POST"
+  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE"
   body?: unknown
   authenticated?: boolean
 }
@@ -28,10 +28,24 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const data: unknown = await response.json().catch(() => null)
 
   if (!response.ok) {
-    const detail =
-      typeof data === "object" && data !== null && "detail" in data && typeof data.detail === "string"
-        ? data.detail
-        : "Unable to complete the request. Please check your details and try again."
+    let detail = "Unable to complete the request. Please check your details and try again."
+    if (typeof data === "object" && data !== null) {
+      if ("detail" in data && typeof (data as { detail: unknown }).detail === "string") {
+        detail = (data as { detail: string }).detail
+      } else {
+        const errorMessages: string[] = []
+        for (const value of Object.values(data as Record<string, unknown>)) {
+          if (Array.isArray(value)) {
+            errorMessages.push(...value.map((v) => (typeof v === "string" ? v : JSON.stringify(v))))
+          } else if (typeof value === "string") {
+            errorMessages.push(value)
+          }
+        }
+        if (errorMessages.length > 0) {
+          detail = errorMessages.join(" ")
+        }
+      }
+    }
     throw new Error(detail)
   }
 
@@ -57,6 +71,28 @@ export type AdminUser = {
   created_at: string
 }
 
+export type Podcast = {
+  id: number
+  embed_code: string
+  description?: string
+  title: string
+  thumbnail_url?: string | null
+  keep_at_home: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type AdminSettings = {
+  max_home_podcasts: number
+  updated_at?: string
+}
+
+export type CreatePodcastPayload = {
+  embed_code: string
+  description?: string
+  keep_at_home?: boolean
+}
+
 export function loginAdmin(credentials: { email: string; password: string }) {
   return request<AdminLoginResponse>("api/auth/admin/login/", { body: credentials })
 }
@@ -72,5 +108,68 @@ export function getAdminUsers() {
   return request<{ count: number; results: AdminUser[] }>("api/auth/admin/users/", {
     method: "GET",
     authenticated: true,
+  })
+}
+
+export function getPodcasts() {
+  return request<Podcast[] | { count: number; results: Podcast[] }>("api/admin-side/podcasts/", {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function createPodcast(payload: CreatePodcastPayload) {
+  return request<Podcast>("api/admin-side/podcasts/create/", {
+    method: "POST",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function updatePodcast(id: number, payload: Partial<CreatePodcastPayload>) {
+  return request<Podcast>(`api/admin-side/podcasts/${id}/`, {
+    method: "PATCH",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function togglePodcastHome(id: number, keep_at_home: boolean) {
+  return updatePodcast(id, { keep_at_home })
+}
+
+export function getAdminSettings() {
+  return request<AdminSettings>("api/admin-side/settings/", {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function updateAdminSettings(settings: { max_home_podcasts: number }) {
+  return request<AdminSettings>("api/admin-side/settings/", {
+    method: "PUT",
+    body: settings,
+    authenticated: true,
+  })
+}
+
+export function getPodcastDetail(id: number) {
+  return request<Podcast>(`api/admin-side/podcasts/${id}/`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function deletePodcast(id: number) {
+  return request<void>(`api/admin-side/podcasts/${id}/`, {
+    method: "DELETE",
+    authenticated: true,
+  })
+}
+
+export function getHomePodcasts() {
+  return request<Podcast[] | { count: number; results: Podcast[] }>("api/admin-side/podcasts/home/", {
+    method: "GET",
+    authenticated: false,
   })
 }
