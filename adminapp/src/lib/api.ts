@@ -173,3 +173,66 @@ export function getHomePodcasts() {
     authenticated: false,
   })
 }
+
+export type MCQOption = {
+  id?: number
+  option_text: string
+  is_correct: boolean
+  explanation: string
+}
+
+export type MCQQuestion = {
+  id: number
+  question_text: string
+  difficulty: "beginner" | "intermediate" | "advanced" | string
+  subject: string
+  is_active: boolean
+  options: MCQOption[]
+  created_at: string
+  updated_at: string
+}
+
+export type CreateMCQQuestionPayload = {
+  question_text: string
+  difficulty: "beginner" | "intermediate" | "advanced" | string
+  subject: string
+  is_active?: boolean
+  options: MCQOption[]
+}
+
+export function getMCQQuestions() {
+  return request<MCQQuestion[] | { count: number; results: MCQQuestion[] }>("api/admin-side/mcq-questions/", {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function createMCQQuestion(payload: CreateMCQQuestionPayload) {
+  return request<MCQQuestion>("api/admin-side/mcq-questions/create/", {
+    method: "POST",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function getMCQQuestionDetail(id: number) {
+  return request<MCQQuestion>(`api/admin-side/mcq-questions/${id}/`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function updateMCQQuestion(id: number, payload: Partial<CreateMCQQuestionPayload>) {
+  return request<MCQQuestion>(`api/admin-side/mcq-questions/${id}/`, {
+    method: "PUT",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function deleteMCQQuestion(id: number) {
+  return request<void>(`api/admin-side/mcq-questions/${id}/`, {
+    method: "DELETE",
+    authenticated: true,
+  })
+}
