@@ -65,10 +65,23 @@ export type AdminLoginResponse = {
 export type AdminUser = {
   id: number
   email: string
+  first_name?: string
+  last_name?: string
+  full_name?: string
+  role?: string | null
   is_active: boolean
   is_staff: boolean
   is_superuser: boolean
   created_at: string
+}
+
+export type CreateStaffPayload = {
+  email: string
+  password: string
+  first_name?: string
+  last_name?: string
+  role?: string
+  is_superuser?: boolean
 }
 
 export type Podcast = {
@@ -97,7 +110,7 @@ export function loginAdmin(credentials: { email: string; password: string }) {
   return request<AdminLoginResponse>("api/auth/admin/login/", { body: credentials })
 }
 
-export function createStaff(staff: { email: string; password: string; is_superuser: boolean }) {
+export function createStaff(staff: CreateStaffPayload) {
   return request<{ message: string; staff: AdminUser }>("api/auth/admin/create-staff/", {
     body: staff,
     authenticated: true,
@@ -174,30 +187,50 @@ export function getHomePodcasts() {
   })
 }
 
+export type QuestionType = "standard" | "image_based" | "scene_based" | "chronological" | "match_following"
+
+export type MCQMetadata = {
+  items?: string[]
+  left_column?: string[]
+  right_column?: string[]
+  correct_pairs?: Record<string, string>
+  explanation?: string
+  [key: string]: any
+}
+
 export type MCQOption = {
   id?: number
   option_text: string
+  image_url?: string | null
   is_correct: boolean
   explanation: string
 }
 
 export type MCQQuestion = {
   id: number
+  question_type: QuestionType
   question_text: string
+  scenario_text?: string | null
+  image_url?: string | null
+  metadata?: MCQMetadata | null
   difficulty: "beginner" | "intermediate" | "advanced" | string
   subject: string
   is_active: boolean
-  options: MCQOption[]
+  options?: MCQOption[]
   created_at: string
   updated_at: string
 }
 
 export type CreateMCQQuestionPayload = {
+  question_type: QuestionType
   question_text: string
+  scenario_text?: string
+  image_url?: string
+  metadata?: MCQMetadata
   difficulty: "beginner" | "intermediate" | "advanced" | string
   subject: string
   is_active?: boolean
-  options: MCQOption[]
+  options?: MCQOption[]
 }
 
 export function getMCQQuestions() {
@@ -208,7 +241,7 @@ export function getMCQQuestions() {
 }
 
 export function createMCQQuestion(payload: CreateMCQQuestionPayload) {
-  return request<MCQQuestion>("api/admin-side/mcq-questions/create/", {
+  return request<MCQQuestion>("api/admin-side/mcq-questions/", {
     method: "POST",
     body: payload,
     authenticated: true,
@@ -233,6 +266,63 @@ export function updateMCQQuestion(id: number, payload: Partial<CreateMCQQuestion
 export function deleteMCQQuestion(id: number) {
   return request<void>(`api/admin-side/mcq-questions/${id}/`, {
     method: "DELETE",
+    authenticated: true,
+  })
+}
+
+export type LanguageSystemStats = {
+  total_words: number
+  total_translations: number
+  failed_translations: number
+  total_audio: number
+  failed_audio: number
+}
+
+export type AdminDailyWord = {
+  id: number
+  word: string
+  day_number: number
+  status: string
+  category: string | null
+  translations_count: number
+  audio_count: number
+  created_at: string
+}
+
+export function getLanguageSystemStats() {
+  return request<LanguageSystemStats>("api/admin-side/language-system/stats/", {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function getLanguageSystemWords() {
+  return request<AdminDailyWord[] | { count: number; results: AdminDailyWord[] }>("api/admin-side/language-system/words/", {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export type WordTranslation = {
+  language: { code: string; name: string; native_name: string }
+  translated_word: string
+  translated_sentence: string
+  translation_status: string
+  audio: { word_audio_url?: string; sentence_audio_url?: string }
+}
+
+export type AdminDailyWordDetail = {
+  id: number
+  word: string
+  definition: string
+  english_sentence: string
+  day_number: number
+  translations: WordTranslation[]
+}
+
+export function getLanguageSystemWordDetail(id: number) {
+  return request<AdminDailyWordDetail>(`api/admin-side/language-system/words/${id}/`, {
+    method: "GET",
     authenticated: true,
   })
 }

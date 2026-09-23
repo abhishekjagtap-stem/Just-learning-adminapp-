@@ -24,12 +24,18 @@ export function LoginPage() {
         email: String(form.get("email")),
         password: String(form.get("password")),
       })
+      const user = response.user
       sessionStorage.setItem("admin-auth-token", response.tokens.access)
       sessionStorage.setItem("admin-refresh-token", response.tokens.refresh)
-      sessionStorage.setItem("admin-user", JSON.stringify(response.user))
+      sessionStorage.setItem("admin-user", JSON.stringify(user))
       sessionStorage.setItem("admin-notice", response.message)
       toast(response.message)
-      navigateTo("/dashboard")
+
+      if (!user.is_superuser && (user.role === "content_creator" || user.role === "content_manager")) {
+        navigateTo("/cms")
+      } else {
+        navigateTo("/dashboard")
+      }
     } catch (submitError) {
       const errorMessage = submitError instanceof Error ? submitError.message : "Unable to sign in. Please try again."
       setError(errorMessage)
@@ -45,7 +51,7 @@ export function LoginPage() {
         <section className="relative hidden overflow-hidden bg-primary p-12 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="absolute -right-24 -top-20 size-80 rounded-full border-[36px] border-white/10" />
           <div className="absolute -bottom-20 -left-20 size-64 rounded-full bg-[#9b5de5]" />
-          <Brand className="relative" />
+          <Brand className="relative" variant="light" />
           <div className="relative max-w-md"><p className="mb-5 text-sm font-medium tracking-wide text-purple-100">ADMIN PORTAL</p><h1 className="text-4xl font-semibold leading-tight tracking-tight">One mission. One workspace.</h1><p className="mt-5 max-w-sm text-base leading-7 text-purple-50/85">One clear place to manage the work that drives JL forward.</p></div>
           <p className="relative text-sm text-purple-100/80">© 2026 JL. Built for meaningful work.</p>
         </section>
