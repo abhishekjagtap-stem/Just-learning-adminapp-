@@ -17,6 +17,7 @@ import {
   Languages,
   FileText,
   Calendar,
+  Landmark,
   CheckSquare,
   Upload,
   Folder,
@@ -54,6 +55,7 @@ const mainNavItems: NavItem[] = [
 
 const cmsNavItems: NavItem[] = [
   { label: "Content Hub", icon: FileText, path: "/cms" },
+  { label: "Manage State Data", icon: Landmark, path: "/cms/states" },
   { label: "Calendar", icon: Calendar, path: "/cms/calendar" },
   { label: "Pending Approvals", icon: CheckSquare, path: "/cms/approvals" },
   { label: "Published Library", icon: Upload, path: "/cms/published" },
@@ -172,7 +174,9 @@ export function Sidebar({ collapsed, onToggle, mobile = false }: { collapsed: bo
             )
           }
 
-          const active = item.path === currentPath
+          const active =
+            item.path === currentPath ||
+            (Boolean(item.path) && item.path !== "/cms" && item.path !== "/dashboard" && currentPath.startsWith(`${item.path}/`))
           const unavailable = !item.path
           return (
             <button

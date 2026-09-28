@@ -326,3 +326,162 @@ export function getLanguageSystemWordDetail(id: number) {
     authenticated: true,
   })
 }
+
+// Cultural State Content Types & API Functions
+export interface IndianStateDirectoryItem {
+  state_name: string
+  state_code: string
+  has_content: boolean
+  content_id: number | null
+  capital: string | null
+  is_published: boolean | null
+  hero_image_url: string | null
+  updated_at: string | null
+}
+
+export interface TimelineEvent {
+  id?: number
+  year_or_era: string
+  title: string
+  description: string
+  order?: number
+}
+
+export interface TheStoryTab {
+  title: string
+  description: string
+  timeline: TimelineEvent[]
+}
+
+export interface StateFestival {
+  id?: number
+  title: string
+  image_url: string
+  description: string
+  order?: number
+}
+
+export interface StateFood {
+  id?: number
+  dish_name: string
+  image_url: string
+  origin: string
+  ingredients: string
+  order?: number
+}
+
+export interface StateArtCraft {
+  id?: number
+  title: string
+  image_url: string
+  description?: string
+  order?: number
+}
+
+export interface TheCultureTab {
+  festivals: StateFestival[]
+  foods: StateFood[]
+  arts_and_crafts: StateArtCraft[]
+}
+
+export type DestinationTag = "forts" | "palaces" | "temples" | "wildlife" | "nature"
+
+export interface IconicDestination {
+  id?: number
+  title: string
+  category_tag: DestinationTag
+  image_url: string
+  description: string
+  fact: string
+  order?: number
+}
+
+export interface TheLandTab {
+  geographic_image_url: string
+  geographic_overview: string
+  iconic_destinations: IconicDestination[]
+}
+
+export interface StateLegend {
+  id?: number
+  name: string
+  subtitle: string
+  image_url: string
+  description: string
+  order?: number
+}
+
+export interface StateCulturalContent {
+  id?: number
+  state_name: string
+  state_code?: string
+  capital: string
+  language_spoken_mostly: string
+  subtitle: string
+  hero_image_url: string
+  is_published: boolean
+  the_story: TheStoryTab
+  the_culture: TheCultureTab
+  the_land: TheLandTab
+  the_legends: StateLegend[]
+  created_at?: string
+  updated_at?: string
+}
+
+export function getCulturalStatesDirectory(params?: { status?: "pending" | "created"; search?: string }) {
+  const query = new URLSearchParams()
+  if (params?.status) query.set("status", params.status)
+  if (params?.search) query.set("search", params.search)
+  const qs = query.toString() ? `?${query.toString()}` : ""
+  return request<IndianStateDirectoryItem[]>(`api/admin-side/content-management/cultural/states/${qs}`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function getCulturalStatesContentList(search?: string) {
+  const query = search ? `?search=${encodeURIComponent(search)}` : ""
+  return request<StateCulturalContent[]>(`api/admin-side/content-management/cultural/states/content/${query}`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function getCulturalStateContent(identifier: string | number) {
+  return request<StateCulturalContent>(`api/admin-side/content-management/cultural/states/content/${identifier}/`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function createCulturalStateContent(payload: StateCulturalContent) {
+  return request<StateCulturalContent>("api/admin-side/content-management/cultural/states/content/", {
+    method: "POST",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function updateCulturalStateContent(identifier: string | number, payload: Partial<StateCulturalContent>) {
+  return request<StateCulturalContent>(`api/admin-side/content-management/cultural/states/content/${identifier}/`, {
+    method: "PATCH",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function putCulturalStateContent(identifier: string | number, payload: StateCulturalContent) {
+  return request<StateCulturalContent>(`api/admin-side/content-management/cultural/states/content/${identifier}/`, {
+    method: "PUT",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function deleteCulturalStateContent(identifier: string | number) {
+  return request<void>(`api/admin-side/content-management/cultural/states/content/${identifier}/`, {
+    method: "DELETE",
+    authenticated: true,
+  })
+}
+

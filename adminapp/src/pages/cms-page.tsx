@@ -4,6 +4,7 @@ import {
   X,
   Search,
   Calendar,
+  Landmark,
 } from "lucide-react"
 import { Header } from "@/components/dashboard/header"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
 import { Dialog } from "@base-ui/react/dialog"
 import { EditorialCalendar } from "@/components/cms/editorial-calendar"
+import { ManageStateDataView } from "@/components/cms/manage-state-data-view"
 import { navigateTo } from "@/lib/navigation"
 
 export type CMSArticle = {
@@ -85,13 +87,14 @@ const initialArticles: CMSArticle[] = [
   },
 ]
 
-type CMSTab = "all" | "reviews" | "published" | "calendar"
+type CMSTab = "all" | "reviews" | "published" | "calendar" | "states"
 
 export function CMSPage() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const getTabFromPath = (path: string): CMSTab => {
+    if (path.startsWith("/cms/states")) return "states"
     if (path === "/cms/calendar") return "calendar"
     if (path === "/cms/approvals") return "reviews"
     if (path === "/cms/published") return "published"
@@ -116,7 +119,8 @@ export function CMSPage() {
 
   const handleTabChange = (tab: CMSTab) => {
     setActiveTab(tab)
-    if (tab === "calendar") navigateTo("/cms/calendar")
+    if (tab === "states") navigateTo("/cms/states")
+    else if (tab === "calendar") navigateTo("/cms/calendar")
     else if (tab === "reviews") navigateTo("/cms/approvals")
     else if (tab === "published") navigateTo("/cms/published")
     else navigateTo("/cms")
@@ -241,11 +245,20 @@ export function CMSPage() {
     <div className="flex min-h-svh">
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((value) => !value)} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header title={activeTab === "calendar" ? "Editorial Calendar" : "Content management"} onMenuClick={() => setMobileOpen(true)} />
+        <Header
+          title={
+            activeTab === "states"
+              ? "Cultural Content — Indian States & UTs"
+              : activeTab === "calendar"
+              ? "Editorial Calendar"
+              : "Content management"
+          }
+          onMenuClick={() => setMobileOpen(true)}
+        />
         <main className="flex-1 p-4 sm:p-7">
           <div className="mx-auto max-w-7xl">
-            {/* Top Bar Header & Stat Cards (only for non-calendar tabs) */}
-            {activeTab !== "calendar" && (
+            {/* Top Bar Header & Stat Cards (only for non-calendar & non-states tabs) */}
+            {activeTab !== "calendar" && activeTab !== "states" && (
               <>
                 <div className="mb-6 flex items-start justify-between gap-4">
                   <div>
@@ -364,9 +377,18 @@ export function CMSPage() {
                   <Calendar className="size-3.5" />
                   Calendar
                 </Button>
+                <Button
+                  variant={activeTab === "states" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTabChange("states")}
+                  className="gap-1.5"
+                >
+                  <Landmark className="size-3.5" />
+                  Manage State Data
+                </Button>
               </div>
 
-              {activeTab !== "calendar" && (
+              {activeTab !== "calendar" && activeTab !== "states" && (
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -396,7 +418,9 @@ export function CMSPage() {
               )}
             </div>
 
-            {activeTab === "calendar" ? (
+            {activeTab === "states" ? (
+              <ManageStateDataView />
+            ) : activeTab === "calendar" ? (
               <EditorialCalendar
                 articles={articles}
                 onAddArticle={(newArt) => {
