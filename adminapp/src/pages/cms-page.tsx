@@ -421,17 +421,7 @@ export function CMSPage() {
             {activeTab === "states" ? (
               <ManageStateDataView />
             ) : activeTab === "calendar" ? (
-              <EditorialCalendar
-                articles={articles}
-                onAddArticle={(newArt) => {
-                  setArticles([newArt, ...articles])
-                  toast("Content scheduled to calendar successfully!")
-                }}
-                onApprove={handleApprove}
-                onPublish={handlePublish}
-                onOpenReject={handleOpenReject}
-                isManagerOrAdmin={isManagerOrAdmin}
-              />
+              <EditorialCalendar />
             ) : (
               /* Articles Table */
               <div className="overflow-hidden rounded-xl border bg-card">

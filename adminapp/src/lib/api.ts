@@ -485,3 +485,151 @@ export function deleteCulturalStateContent(identifier: string | number) {
   })
 }
 
+// ------------------------------------------------------------
+// TODAY IN INDIA (Daily Cultural Content & Scheduling)
+// ------------------------------------------------------------
+
+export type TodayInIndiaCategory =
+  | "festive_story"
+  | "history"
+  | "people"
+  | "food"
+  | "art_and_craft"
+  | "science_and_nature"
+  | "language"
+  | "place"
+
+export interface TodayInIndiaCategoryOption {
+  value: TodayInIndiaCategory
+  label: string
+}
+
+export interface TodayInIndiaTag {
+  id?: number
+  title: string
+  subtitle: string
+  order?: number
+}
+
+export interface TodayInIndiaGalleryItem {
+  id?: number
+  image_url: string
+  title: string
+  subtitle?: string
+  order?: number
+}
+
+export interface TodayInIndiaItem {
+  id?: number
+  main_tag: string
+  category: TodayInIndiaCategory
+  category_display?: string
+  scheduled_date: string
+  title: string
+  subtitle?: string
+  hero_image_url: string
+  state?: string
+  description: string
+  status: "draft" | "scheduled" | "published"
+  status_display?: string
+  tags: TodayInIndiaTag[]
+  festive_gallery: TodayInIndiaGalleryItem[]
+  fact_image_url?: string
+  fact_title?: string
+  fact_description?: string
+  created_by?: number
+  created_by_email?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type CreateTodayInIndiaPayload = Omit<
+  TodayInIndiaItem,
+  "id" | "created_by" | "created_by_email" | "created_at" | "updated_at" | "category_display" | "status_display"
+>
+
+export interface TodayInIndiaCalendarEntry {
+  id: number
+  title: string
+  category: TodayInIndiaCategory
+  category_display?: string
+  scheduled_date: string
+  status: "draft" | "scheduled" | "published"
+  hero_image_url: string
+  state?: string
+}
+
+export interface TodayInIndiaCalendarResponse {
+  year: number
+  month: number
+  total_entries: number
+  dates: Record<string, TodayInIndiaCalendarEntry[]>
+}
+
+export function getTodayInIndiaCategories() {
+  return request<TodayInIndiaCategoryOption[]>("api/admin-side/content-management/cultural/today-in-india/categories/", {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function getTodayInIndiaCalendar(year: number, month: number) {
+  return request<TodayInIndiaCalendarResponse>(
+    `api/admin-side/content-management/cultural/today-in-india/calendar/?year=${year}&month=${month}`,
+    {
+      method: "GET",
+      authenticated: true,
+    }
+  )
+}
+
+export function getTodayInIndiaList(params?: { search?: string; status?: string; category?: string }) {
+  const query = new URLSearchParams()
+  if (params?.search) query.set("search", params.search)
+  if (params?.status) query.set("status", params.status)
+  if (params?.category) query.set("category", params.category)
+  const qs = query.toString() ? `?${query.toString()}` : ""
+  return request<TodayInIndiaItem[]>(`api/admin-side/content-management/cultural/today-in-india/${qs}`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function getTodayInIndiaDetail(id: number) {
+  return request<TodayInIndiaItem>(`api/admin-side/content-management/cultural/today-in-india/${id}/`, {
+    method: "GET",
+    authenticated: true,
+  })
+}
+
+export function createTodayInIndia(payload: CreateTodayInIndiaPayload) {
+  return request<TodayInIndiaItem>("api/admin-side/content-management/cultural/today-in-india/", {
+    method: "POST",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function updateTodayInIndia(id: number, payload: Partial<CreateTodayInIndiaPayload>) {
+  return request<TodayInIndiaItem>(`api/admin-side/content-management/cultural/today-in-india/${id}/`, {
+    method: "PATCH",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function putTodayInIndia(id: number, payload: CreateTodayInIndiaPayload) {
+  return request<TodayInIndiaItem>(`api/admin-side/content-management/cultural/today-in-india/${id}/`, {
+    method: "PUT",
+    body: payload,
+    authenticated: true,
+  })
+}
+
+export function deleteTodayInIndia(id: number) {
+  return request<void>(`api/admin-side/content-management/cultural/today-in-india/${id}/`, {
+    method: "DELETE",
+    authenticated: true,
+  })
+}
+
