@@ -20,7 +20,15 @@ export function Header({
   subtitle?: string
   isCms?: boolean
 }) {
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"))
+  const [dark, setDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme")
+      if (saved === "dark") return true
+      if (saved === "light") return false
+      return document.documentElement.classList.contains("dark")
+    }
+    return false
+  })
   const [user] = useState<StoredUser | null>(() => {
     const value = sessionStorage.getItem("admin-user")
     if (!value) return null
@@ -33,7 +41,20 @@ export function Header({
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark)
+    try {
+      localStorage.setItem("theme", dark ? "dark" : "light")
+    } catch {}
   }, [dark])
+
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "theme" && e.newValue) {
+        setDark(e.newValue === "dark")
+      }
+    }
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [])
 
   const email = user?.email ?? "Administrator"
   const initials =

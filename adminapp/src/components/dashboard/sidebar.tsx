@@ -5,22 +5,15 @@ import {
   ChevronRight,
   CircleHelp,
   Gamepad2,
-  HandHeart,
   HelpCircle,
   LayoutDashboard,
   LogOut,
   Radio,
-  Settings,
-  ShieldCheck,
   Users,
-  WalletCards,
   Languages,
   FileText,
   Calendar,
   Landmark,
-  CheckSquare,
-  Upload,
-  Folder,
   ArrowLeftRight,
   Share2,
   Trophy,
@@ -50,10 +43,6 @@ const mainNavItems: NavItem[] = [
     ],
   },
   { label: "Language System", icon: Languages, path: "/language-system" },
-  { label: "Funds", icon: WalletCards },
-  { label: "Donations", icon: HandHeart },
-  { label: "Parent Consent", icon: ShieldCheck },
-  { label: "Settings", icon: Settings },
 ]
 
 const cmsNavItems: NavItem[] = [
@@ -63,9 +52,6 @@ const cmsNavItems: NavItem[] = [
   { label: "Manage State Data", icon: Landmark, path: "/cms/states" },
   { label: "Calendar", icon: Calendar, path: "/cms/calendar" },
   { label: "Post on Feed", icon: Share2, path: "/cms/feed-post" },
-  { label: "Pending Approvals", icon: CheckSquare, path: "/cms/approvals" },
-  { label: "Published Library", icon: Upload, path: "/cms/published" },
-  { label: "Media & Assets", icon: Folder },
 ]
 
 export function Sidebar({ collapsed, onToggle, mobile = false }: { collapsed: boolean; onToggle: () => void; mobile?: boolean }) {
