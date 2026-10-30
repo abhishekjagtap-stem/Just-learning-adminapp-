@@ -495,13 +495,14 @@ export function TodayInIndiaEditor({
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {categories.map((cat) => {
-                  const Icon = CATEGORY_ICONS[cat.key] || Sparkles
-                  const isSelected = category === cat.key
+                  const catKey = (cat.key || cat.value || "festive_story") as TodayInIndiaCategory
+                  const Icon = CATEGORY_ICONS[catKey] || Sparkles
+                  const isSelected = category === catKey
                   return (
                     <button
-                      key={cat.key}
+                      key={catKey}
                       type="button"
-                      onClick={() => setCategory(cat.key)}
+                      onClick={() => setCategory(catKey)}
                       className={cn(
                         "group flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer",
                         isSelected

@@ -22,6 +22,9 @@ import {
   Upload,
   Folder,
   ArrowLeftRight,
+  Share2,
+  Trophy,
+  Sparkles,
 } from "lucide-react"
 import { Brand } from "@/components/brand"
 import { Button } from "@/components/ui/button"
@@ -55,8 +58,11 @@ const mainNavItems: NavItem[] = [
 
 const cmsNavItems: NavItem[] = [
   { label: "Content Hub", icon: FileText, path: "/cms" },
+  { label: "Super Hero Stories", icon: Sparkles, path: "/cms/superheroes" },
+  { label: "Arena Events", icon: Trophy, path: "/cms/events" },
   { label: "Manage State Data", icon: Landmark, path: "/cms/states" },
   { label: "Calendar", icon: Calendar, path: "/cms/calendar" },
+  { label: "Post on Feed", icon: Share2, path: "/cms/feed-post" },
   { label: "Pending Approvals", icon: CheckSquare, path: "/cms/approvals" },
   { label: "Published Library", icon: Upload, path: "/cms/published" },
   { label: "Media & Assets", icon: Folder },

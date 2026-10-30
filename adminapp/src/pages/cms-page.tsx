@@ -5,6 +5,9 @@ import {
   Search,
   Calendar,
   Landmark,
+  Share2,
+  Trophy,
+  Sparkles,
 } from "lucide-react"
 import { Header } from "@/components/dashboard/header"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -13,6 +16,9 @@ import { useToast } from "@/components/ui/toast"
 import { Dialog } from "@base-ui/react/dialog"
 import { EditorialCalendar } from "@/components/cms/editorial-calendar"
 import { ManageStateDataView } from "@/components/cms/manage-state-data-view"
+import { OfficialFeedPostView } from "@/components/cms/official-feed-post-view"
+import { ArenaEventsView } from "@/components/cms/arena-events-view"
+import { SuperHeroStoriesView } from "@/components/cms/super-hero-stories-view"
 import { navigateTo } from "@/lib/navigation"
 
 export type CMSArticle = {
@@ -87,13 +93,16 @@ const initialArticles: CMSArticle[] = [
   },
 ]
 
-type CMSTab = "all" | "reviews" | "published" | "calendar" | "states"
+type CMSTab = "all" | "reviews" | "published" | "calendar" | "states" | "feed_post" | "events" | "superheroes"
 
 export function CMSPage() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const getTabFromPath = (path: string): CMSTab => {
+    if (path.startsWith("/cms/superhero")) return "superheroes"
+    if (path.startsWith("/cms/events") || path.startsWith("/cms/arena")) return "events"
+    if (path.startsWith("/cms/feed-post") || path.startsWith("/cms/post")) return "feed_post"
     if (path.startsWith("/cms/states")) return "states"
     if (path === "/cms/calendar") return "calendar"
     if (path === "/cms/approvals") return "reviews"
@@ -119,7 +128,10 @@ export function CMSPage() {
 
   const handleTabChange = (tab: CMSTab) => {
     setActiveTab(tab)
-    if (tab === "states") navigateTo("/cms/states")
+    if (tab === "superheroes") navigateTo("/cms/superheroes")
+    else if (tab === "events") navigateTo("/cms/events")
+    else if (tab === "feed_post") navigateTo("/cms/feed-post")
+    else if (tab === "states") navigateTo("/cms/states")
     else if (tab === "calendar") navigateTo("/cms/calendar")
     else if (tab === "reviews") navigateTo("/cms/approvals")
     else if (tab === "published") navigateTo("/cms/published")
@@ -247,18 +259,24 @@ export function CMSPage() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
           title={
-            activeTab === "states"
+            activeTab === "superheroes"
+              ? "Super Hero Stories Management"
+              : activeTab === "states"
               ? "Cultural Content — Indian States & UTs"
               : activeTab === "calendar"
               ? "Editorial Calendar"
+              : activeTab === "feed_post"
+              ? "Post on Feed — Official Just Learning Brand"
+              : activeTab === "events"
+              ? "Arena Events & Championships"
               : "Content management"
           }
           onMenuClick={() => setMobileOpen(true)}
         />
         <main className="flex-1 p-4 sm:p-7">
           <div className="mx-auto max-w-7xl">
-            {/* Top Bar Header & Stat Cards (only for non-calendar & non-states tabs) */}
-            {activeTab !== "calendar" && activeTab !== "states" && (
+            {/* Top Bar Header & Stat Cards (only for article management tabs) */}
+            {activeTab !== "calendar" && activeTab !== "states" && activeTab !== "feed_post" && activeTab !== "events" && activeTab !== "superheroes" && (
               <>
                 <div className="mb-6 flex items-start justify-between gap-4">
                   <div>
@@ -369,6 +387,24 @@ export function CMSPage() {
                   Published ({publishedCount})
                 </Button>
                 <Button
+                  variant={activeTab === "superheroes" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTabChange("superheroes")}
+                  className="gap-1.5"
+                >
+                  <Sparkles className="size-3.5" />
+                  Super Hero Stories
+                </Button>
+                <Button
+                  variant={activeTab === "events" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTabChange("events")}
+                  className="gap-1.5"
+                >
+                  <Trophy className="size-3.5" />
+                  Arena Events
+                </Button>
+                <Button
                   variant={activeTab === "calendar" ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleTabChange("calendar")}
@@ -386,9 +422,18 @@ export function CMSPage() {
                   <Landmark className="size-3.5" />
                   Manage State Data
                 </Button>
+                <Button
+                  variant={activeTab === "feed_post" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTabChange("feed_post")}
+                  className="gap-1.5"
+                >
+                  <Share2 className="size-3.5" />
+                  Post on Feed
+                </Button>
               </div>
 
-              {activeTab !== "calendar" && activeTab !== "states" && (
+              {activeTab !== "calendar" && activeTab !== "states" && activeTab !== "feed_post" && activeTab !== "events" && activeTab !== "superheroes" && (
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -418,10 +463,16 @@ export function CMSPage() {
               )}
             </div>
 
-            {activeTab === "states" ? (
+            {activeTab === "superheroes" ? (
+              <SuperHeroStoriesView />
+            ) : activeTab === "states" ? (
               <ManageStateDataView />
             ) : activeTab === "calendar" ? (
               <EditorialCalendar />
+            ) : activeTab === "feed_post" ? (
+              <OfficialFeedPostView />
+            ) : activeTab === "events" ? (
+              <ArenaEventsView />
             ) : (
               /* Articles Table */
               <div className="overflow-hidden rounded-xl border bg-card">

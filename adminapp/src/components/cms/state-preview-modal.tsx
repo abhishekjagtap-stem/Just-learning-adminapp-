@@ -15,6 +15,7 @@ import {
   Bookmark,
   Wifi,
   Battery,
+  RefreshCw,
 } from "lucide-react"
 import { Dialog } from "@base-ui/react/dialog"
 import { cn } from "@/lib/utils"
@@ -24,6 +25,8 @@ interface StatePreviewModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   content: StateCulturalContent | null
+  stateName?: string
+  isLoading?: boolean
 }
 
 const TABS: Array<{ key: "story" | "culture" | "land" | "legends"; label: string; icon: typeof BookOpen }> = [
@@ -37,13 +40,13 @@ export function StatePreviewModal({
   open,
   onOpenChange,
   content,
+  stateName,
+  isLoading = false,
 }: StatePreviewModalProps) {
   const [activePreviewTab, setActivePreviewTab] = useState<"story" | "culture" | "land" | "legends">("story")
   const [cultureCategoryFilter, setCultureCategoryFilter] = useState<"all" | "festivals" | "food" | "arts">("all")
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-
-  if (!content) return null
 
   // Support swipe left/right between the 4 tabs
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -68,35 +71,39 @@ export function StatePreviewModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        {/* Backdrop with silky fade-in */}
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs smooth-backdrop-enter" />
+        {/* Backdrop with silky transition */}
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
 
-        {/* Viewport aligned to right edge */}
-        <Dialog.Viewport className="fixed inset-0 z-50 flex justify-end overflow-hidden pointer-events-none">
-          {/* Smooth Slide-over Drawer (100vh with no outer scroll) */}
-          <Dialog.Popup
-            className="pointer-events-auto relative h-[100dvh] w-full sm:w-[480px] bg-slate-950/95 border-l border-slate-800/80 shadow-2xl flex flex-col justify-between p-2.5 sm:p-4 overflow-hidden smooth-drawer-enter"
-          >
-            {/* Drawer Top Bar */}
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mobile Preview</span>
-                <span className="rounded-md bg-primary/20 px-2 py-0.5 text-xs font-bold text-primary">
-                  {content.state_name}
-                </span>
-                <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
-                  • Swipe tabs or scroll
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="grid size-8 place-items-center rounded-full bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer shadow-xs"
-                aria-label="Close drawer"
-              >
-                <X className="size-4" />
-              </button>
+        {/* Ultra-Smooth Hardware-Accelerated Right Drawer */}
+        <Dialog.Popup
+          className={cn(
+            "fixed inset-y-0 right-0 z-50 h-[100dvh] w-full sm:w-[480px] md:w-[500px]",
+            "bg-slate-950/98 border-l border-slate-800/80 shadow-2xl flex flex-col justify-between p-2.5 sm:p-4 overflow-hidden",
+            "data-[state=open]:animate-in data-[state=closed]:animate-out",
+            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+            "duration-300 ease-out focus:outline-none"
+          )}
+        >
+          {/* Drawer Top Bar */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mobile Preview</span>
+              <span className="rounded-md bg-primary/20 px-2 py-0.5 text-xs font-bold text-primary">
+                {content?.state_name || stateName || "State"}
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
+                • {isLoading ? "Loading..." : "Live Preview"}
+              </span>
             </div>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="grid size-8 place-items-center rounded-full bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer shadow-xs"
+              aria-label="Close drawer"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
 
             {/* Mobile Device Frame — Fits 100vh height cleanly */}
             <div className="my-auto py-1 flex justify-center items-center h-[calc(100dvh-5.5rem)]">
@@ -133,7 +140,7 @@ export function StatePreviewModal({
                     </button>
                     <div className="flex flex-col">
                       <span className="text-xs font-black tracking-tight leading-none line-clamp-1">
-                        {content.state_name}
+                        {content?.state_name || stateName || "State Guide"}
                       </span>
                       <span className="text-[10px] text-muted-foreground font-medium">Cultural Guide</span>
                     </div>
@@ -160,18 +167,67 @@ export function StatePreviewModal({
 
                 {/* Mobile Viewport — Slideable & Smoothly Scrollable */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-contain scroll-smooth scrollbar-thin pb-4">
-                  {/* Hero Banner Section */}
-                  <div className="relative h-44 w-full bg-slate-900 shrink-0 overflow-hidden">
-                    {content.hero_image_url ? (
-                      <img
-                        src={content.hero_image_url}
-                        alt={content.state_name}
-                        className="h-full w-full object-cover opacity-80"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = "none"
-                        }}
-                      />
-                    ) : null}
+                  {isLoading || !content ? (
+                    <div className="space-y-3 animate-in fade-in duration-200">
+                      {/* Hero Image Skeleton */}
+                      <div className="relative h-44 w-full bg-slate-900 shrink-0 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800/60 to-slate-900 animate-pulse" />
+                        <div className="absolute bottom-3 left-3.5 right-3.5 space-y-2">
+                          <div className="h-4 w-14 rounded bg-primary/30 animate-pulse" />
+                          <h2 className="text-lg font-black text-foreground tracking-tight">
+                            {stateName || "Loading State..."}
+                          </h2>
+                          <div className="h-3 w-40 rounded bg-slate-800 animate-pulse" />
+                        </div>
+                      </div>
+
+                      {/* Pill Chips Skeleton */}
+                      <div className="px-3.5 py-1 flex items-center gap-2">
+                        <div className="h-5 w-24 rounded-full bg-muted animate-pulse" />
+                        <div className="h-5 w-28 rounded-full bg-muted animate-pulse" />
+                      </div>
+
+                      {/* Tab Bar Skeleton */}
+                      <div className="px-3">
+                        <div className="grid grid-cols-4 gap-1 rounded-xl bg-muted p-1">
+                          {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="h-7 rounded-lg bg-background/50 animate-pulse" />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Content Cards Skeleton */}
+                      <div className="p-3 space-y-3">
+                        <div className="rounded-xl border border-border/60 bg-card p-3.5 space-y-2.5">
+                          <div className="h-4 w-28 rounded bg-muted animate-pulse" />
+                          <div className="h-3 w-full rounded bg-muted/70 animate-pulse" />
+                          <div className="h-3 w-4/5 rounded bg-muted/70 animate-pulse" />
+                        </div>
+                        <div className="rounded-xl border border-border/60 bg-card p-3.5 space-y-2.5">
+                          <div className="h-4 w-36 rounded bg-muted animate-pulse" />
+                          <div className="h-3 w-full rounded bg-muted/70 animate-pulse" />
+                          <div className="h-3 w-2/3 rounded bg-muted/70 animate-pulse" />
+                        </div>
+                        <div className="flex items-center justify-center gap-2 py-4 text-xs text-muted-foreground font-semibold">
+                          <RefreshCw className="size-3.5 animate-spin text-primary" />
+                          <span>Loading state cultural guide...</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Hero Banner Section */}
+                      <div className="relative h-44 w-full bg-slate-900 shrink-0 overflow-hidden">
+                        {content.hero_image_url ? (
+                          <img
+                            src={content.hero_image_url}
+                            alt={content.state_name}
+                            className="h-full w-full object-cover opacity-80"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none"
+                            }}
+                          />
+                        ) : null}
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
                     <div className="absolute bottom-2.5 left-3.5 right-3.5">
@@ -540,29 +596,30 @@ export function StatePreviewModal({
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* Mobile Home Indicator Bar */}
-                <div className="h-5 w-full shrink-0 flex items-center justify-center bg-background">
-                  <div className="w-24 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
-                </div>
-              </div>
+                </>
+              )}
             </div>
 
-            {/* Drawer Bottom Bar */}
-            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 shrink-0">
-              <span>{content.state_code || "IN"} • {content.capital || "State"}</span>
-              <button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="text-xs font-semibold text-slate-300 hover:text-white underline cursor-pointer"
-              >
-                Close Drawer
-              </button>
+            {/* Mobile Home Indicator Bar */}
+            <div className="h-5 w-full shrink-0 flex items-center justify-center bg-background">
+              <div className="w-24 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
             </div>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
-  )
+          </div>
+        </div>
+
+        {/* Drawer Bottom Bar */}
+        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 shrink-0">
+          <span>{content?.state_code || "IN"} • {content?.capital || stateName || "State Guide"}</span>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="text-xs font-semibold text-slate-300 hover:text-white underline cursor-pointer"
+          >
+            Close Drawer
+          </button>
+        </div>
+      </Dialog.Popup>
+    </Dialog.Portal>
+  </Dialog.Root>
+)
 }

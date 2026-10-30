@@ -46,55 +46,55 @@ const CATEGORY_OPTIONS: Array<{
   icon: typeof Sparkles
   badgeClass: string
 }> = [
-  {
-    value: "festive_story",
-    label: "Festive Story",
-    icon: Sparkles,
-    badgeClass: "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300",
-  },
-  {
-    value: "history",
-    label: "History",
-    icon: History,
-    badgeClass: "bg-orange-100 text-orange-950 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300",
-  },
-  {
-    value: "people",
-    label: "About Someone or People",
-    icon: Users,
-    badgeClass: "bg-blue-100 text-blue-950 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300",
-  },
-  {
-    value: "food",
-    label: "Food",
-    icon: Utensils,
-    badgeClass: "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300",
-  },
-  {
-    value: "art_and_craft",
-    label: "Art and Craft",
-    icon: Palette,
-    badgeClass: "bg-purple-100 text-purple-950 border-purple-300 dark:bg-purple-950/70 dark:text-purple-300",
-  },
-  {
-    value: "science_and_nature",
-    label: "Science and Nature",
-    icon: Leaf,
-    badgeClass: "bg-teal-100 text-teal-950 border-teal-300 dark:bg-teal-950/70 dark:text-teal-300",
-  },
-  {
-    value: "language",
-    label: "Language",
-    icon: Languages,
-    badgeClass: "bg-pink-100 text-pink-950 border-pink-300 dark:bg-pink-950/70 dark:text-pink-300",
-  },
-  {
-    value: "place",
-    label: "Place",
-    icon: Landmark,
-    badgeClass: "bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-950/70 dark:text-indigo-300",
-  },
-]
+    {
+      value: "festive_story",
+      label: "Festive Story",
+      icon: Sparkles,
+      badgeClass: "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300",
+    },
+    {
+      value: "history",
+      label: "History",
+      icon: History,
+      badgeClass: "bg-orange-100 text-orange-950 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300",
+    },
+    {
+      value: "people",
+      label: "About Someone or People",
+      icon: Users,
+      badgeClass: "bg-blue-100 text-blue-950 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300",
+    },
+    {
+      value: "food",
+      label: "Food",
+      icon: Utensils,
+      badgeClass: "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300",
+    },
+    {
+      value: "art_and_craft",
+      label: "Art and Craft",
+      icon: Palette,
+      badgeClass: "bg-purple-100 text-purple-950 border-purple-300 dark:bg-purple-950/70 dark:text-purple-300",
+    },
+    {
+      value: "science_and_nature",
+      label: "Science and Nature",
+      icon: Leaf,
+      badgeClass: "bg-teal-100 text-teal-950 border-teal-300 dark:bg-teal-950/70 dark:text-teal-300",
+    },
+    {
+      value: "language",
+      label: "Language",
+      icon: Languages,
+      badgeClass: "bg-pink-100 text-pink-950 border-pink-300 dark:bg-pink-950/70 dark:text-pink-300",
+    },
+    {
+      value: "place",
+      label: "Place",
+      icon: Landmark,
+      badgeClass: "bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-950/70 dark:text-indigo-300",
+    },
+  ]
 
 export function TodayInIndiaModal({
   open,
@@ -155,10 +155,10 @@ export function TodayInIndiaModal({
         setGallery(
           initialData.festive_gallery && initialData.festive_gallery.length > 0
             ? initialData.festive_gallery.map((g) => ({
-                image_url: g.image_url,
-                title: g.title,
-                subtitle: g.subtitle || "",
-              }))
+              image_url: g.image_url,
+              title: g.title,
+              subtitle: g.subtitle || "",
+            }))
             : []
         )
         setFactImageUrl(initialData.fact_image_url || "")
@@ -276,8 +276,8 @@ export function TodayInIndiaModal({
           targetStatus === "draft"
             ? "Content draft updated successfully!"
             : targetStatus === "published"
-            ? "Content published live successfully!"
-            : "Content scheduled successfully!"
+              ? "Content published live successfully!"
+              : "Content scheduled successfully!"
         )
       } else {
         await createTodayInIndia(payload)
@@ -285,8 +285,8 @@ export function TodayInIndiaModal({
           targetStatus === "draft"
             ? "Saved as draft successfully!"
             : targetStatus === "published"
-            ? "Content published live successfully!"
-            : "Content scheduled to calendar successfully!"
+              ? "Content published live successfully!"
+              : "Content scheduled to calendar successfully!"
         )
       }
       onSuccess()
@@ -490,7 +490,7 @@ export function TodayInIndiaModal({
                         alt="Hero preview"
                         className="h-full w-full object-cover"
                         onError={(e) => {
-                          ;(e.target as HTMLElement).style.display = "none"
+                          ; (e.target as HTMLElement).style.display = "none"
                         }}
                       />
                     </div>

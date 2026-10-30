@@ -170,6 +170,8 @@ export function ManageStateDataView() {
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewContent, setPreviewContent] = useState<StateCulturalContent | null>(null)
+  const [previewStateName, setPreviewStateName] = useState("")
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false)
 
   // Delete state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -283,18 +285,25 @@ export function ManageStateDataView() {
 
   const handleOpenPreview = async (item: IndianStateDirectoryItem) => {
     if (!item.has_content) return
+    // Open preview drawer immediately with 0ms delay
+    setPreviewStateName(item.state_name)
+    setPreviewContent(null)
+    setIsPreviewLoading(true)
+    setPreviewOpen(true)
+
     try {
       const identifier = item.content_id ?? item.state_code ?? item.state_name
       const data = await getCulturalStateContent(identifier)
       setPreviewContent(data)
-      setPreviewOpen(true)
-    } catch (err) {
+    } catch {
       if (item.state_code === "MH" || item.state_name === "Maharashtra") {
         setPreviewContent(SAMPLE_MAHARASHTRA_CONTENT)
-        setPreviewOpen(true)
       } else {
         toast("Unable to preview state content.", "error")
+        setPreviewOpen(false)
       }
+    } finally {
+      setIsPreviewLoading(false)
     }
   }
 
@@ -359,7 +368,9 @@ export function ManageStateDataView() {
             setPreselectedState(null)
           }}
           onPreview={(content) => {
+            setPreviewStateName(content.state_name)
             setPreviewContent(content)
+            setIsPreviewLoading(false)
             setPreviewOpen(true)
           }}
           isSaving={isSaving}
@@ -368,6 +379,8 @@ export function ManageStateDataView() {
           open={previewOpen}
           onOpenChange={setPreviewOpen}
           content={previewContent}
+          stateName={previewStateName}
+          isLoading={isPreviewLoading}
         />
       </div>
     )
@@ -800,6 +813,8 @@ export function ManageStateDataView() {
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         content={previewContent}
+        stateName={previewStateName}
+        isLoading={isPreviewLoading}
       />
     </div>
   )
