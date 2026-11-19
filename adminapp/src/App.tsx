@@ -12,6 +12,8 @@ import { CMSPage } from "@/pages/cms-page"
 import { Toaster } from "@/components/ui/toast"
 import { navigateTo } from "@/lib/navigation"
 
+import { getAdminToken } from "@/lib/api"
+
 function App() {
   const [path, setPath] = useState(window.location.pathname)
 
@@ -25,20 +27,41 @@ function App() {
     }
   }, [])
 
-  // Check stored user role for route restrictions
-  const userString = sessionStorage.getItem("admin-user")
+  // Check stored user role and token for authentication and route restrictions
+  const token = getAdminToken()
+  const userString = sessionStorage.getItem("admin-user") || localStorage.getItem("admin-user")
   const currentUser = userString ? JSON.parse(userString) : null
+  const isAuthenticated = Boolean(token && currentUser)
+
   const isContentUserOnly =
     currentUser &&
     !currentUser.is_superuser &&
     (currentUser.role === "content_creator" || currentUser.role === "content_manager")
 
+  // If already authenticated and visiting "/" or "/login", redirect to appropriate home
+  useEffect(() => {
+    if (isAuthenticated && (path === "/" || path === "/login")) {
+      if (isContentUserOnly) {
+        navigateTo("/cms")
+      } else {
+        navigateTo("/dashboard")
+      }
+    }
+  }, [path, isAuthenticated, isContentUserOnly])
+
+  // If NOT authenticated and visiting any protected route, redirect to /login
+  useEffect(() => {
+    if (!isAuthenticated && path !== "/login" && path !== "/") {
+      navigateTo("/login")
+    }
+  }, [path, isAuthenticated])
+
   // If a content user tries to access main admin tabs, redirect them to /cms
   useEffect(() => {
-    if (isContentUserOnly && !path.startsWith("/cms") && path !== "/login") {
+    if (isAuthenticated && isContentUserOnly && !path.startsWith("/cms")) {
       navigateTo("/cms")
     }
-  }, [path, isContentUserOnly])
+  }, [path, isAuthenticated, isContentUserOnly])
 
   const podcastMatch = path.match(/^\/podcasts\/(\d+)$/)
   const podcastId = podcastMatch ? Number(podcastMatch[1]) : null
@@ -46,17 +69,23 @@ function App() {
   const mcqMatch = path.match(/^\/games\/mcq\/(\d+)$/)
   const mcqId = mcqMatch ? Number(mcqMatch[1]) : null
 
-  let page = <LoginPage />
+  if (!isAuthenticated) {
+    return (
+      <Toaster>
+        <LoginPage />
+      </Toaster>
+    )
+  }
 
-  if (path.startsWith("/cms")) {
-    page = <CMSPage />
-  } else if (isContentUserOnly) {
+  let page = <DashboardPage />
+
+  if (path.startsWith("/cms") || isContentUserOnly) {
     page = <CMSPage />
   } else if (podcastId !== null) {
     page = <PodcastDetailPage podcastId={podcastId} />
   } else if (mcqId !== null) {
     page = <MCQDetailPage questionId={mcqId} />
-  } else if (path === "/dashboard") {
+  } else if (path === "/dashboard" || path === "/") {
     page = <DashboardPage />
   } else if (path === "/users") {
     page = <UsersPage />

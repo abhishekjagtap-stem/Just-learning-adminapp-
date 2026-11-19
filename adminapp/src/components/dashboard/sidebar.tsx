@@ -68,7 +68,7 @@ export function Sidebar({ collapsed, onToggle, mobile = false }: { collapsed: bo
     }
   }, [])
 
-  const userString = sessionStorage.getItem("admin-user")
+  const userString = sessionStorage.getItem("admin-user") || localStorage.getItem("admin-user")
   const currentUser = userString ? JSON.parse(userString) : null
   const isSuperadmin = currentUser?.is_superuser
   const isContentRole = currentUser?.role === "content_creator" || currentUser?.role === "content_manager"
@@ -78,6 +78,11 @@ export function Sidebar({ collapsed, onToggle, mobile = false }: { collapsed: bo
 
   const logOut = () => {
     sessionStorage.clear()
+    localStorage.removeItem("admin-auth-token")
+    localStorage.removeItem("admin-refresh-token")
+    localStorage.removeItem("admin-user")
+    localStorage.removeItem("admin-notice")
+    localStorage.removeItem("token")
     navigateTo("/login")
   }
 

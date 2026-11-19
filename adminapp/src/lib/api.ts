@@ -14,8 +14,16 @@ type RequestOptions = {
   authenticated?: boolean
 }
 
+export function getAdminToken(): string | null {
+  return (
+    sessionStorage.getItem("admin-auth-token") ||
+    localStorage.getItem("admin-auth-token") ||
+    localStorage.getItem("token")
+  )
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const token = sessionStorage.getItem("admin-auth-token")
+  const token = getAdminToken()
   const headers: Record<string, string> = { "Content-Type": "application/json" }
   if (options.authenticated && token) headers.Authorization = `Bearer ${token}`
 
@@ -669,7 +677,7 @@ export const fetchFeedEvents = async ({
   status = "approved",
   limit = 20,
 }: SearchFeedEventsParams = {}): Promise<FeedEventsResponse> => {
-  const token = sessionStorage.getItem("admin-auth-token") || localStorage.getItem("token")
+  const token = getAdminToken()
   const url = new URL(endpoint("api/admin/feed/events/"))
   if (search.trim()) {
     url.searchParams.append("search", search.trim())
@@ -781,7 +789,7 @@ export const createOfficialJLPost = async ({
   event,
   eventId,
 }: CreateJLPostPayload): Promise<CreateJLPostResponse> => {
-  const token = sessionStorage.getItem("admin-auth-token") || localStorage.getItem("token")
+  const token = getAdminToken()
   const formData = new FormData()
   formData.append("description", description)
   formData.append("post_type", post_type)
@@ -989,7 +997,7 @@ export async function getArenaEventDetail(id: number): Promise<ArenaEventDetail>
 }
 
 export async function createArenaEvent(payload: CreateArenaEventPayload): Promise<ArenaEventDetail> {
-  const token = sessionStorage.getItem("admin-auth-token") || localStorage.getItem("token")
+  const token = getAdminToken()
 
   if (payload.media instanceof File) {
     const formData = new FormData()
@@ -1041,7 +1049,7 @@ export async function updateArenaEvent(
   id: number,
   payload: Partial<CreateArenaEventPayload>
 ): Promise<ArenaEventDetail> {
-  const token = sessionStorage.getItem("admin-auth-token") || localStorage.getItem("token")
+  const token = getAdminToken()
 
   if (payload.media instanceof File) {
     const formData = new FormData()
@@ -1334,7 +1342,7 @@ export async function toggleSuperheroShowOnHome(
 export async function createSuperhero(
   payload: CreateSuperheroPayload
 ): Promise<{ message: string; post: SuperheroDetailItem }> {
-  const token = sessionStorage.getItem("admin-auth-token") || localStorage.getItem("token")
+  const token = getAdminToken()
   const formData = new FormData()
 
   formData.append("name_of_hero", payload.name_of_hero)
@@ -1394,7 +1402,7 @@ export async function updateSuperhero(
   id: number,
   payload: UpdateSuperheroPayload
 ): Promise<SuperheroDetailItem> {
-  const token = sessionStorage.getItem("admin-auth-token") || localStorage.getItem("token")
+  const token = getAdminToken()
 
   if (payload.media instanceof File) {
     const formData = new FormData()

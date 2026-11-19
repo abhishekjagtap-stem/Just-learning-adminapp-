@@ -29,6 +29,11 @@ export function LoginPage() {
       sessionStorage.setItem("admin-refresh-token", response.tokens.refresh)
       sessionStorage.setItem("admin-user", JSON.stringify(user))
       sessionStorage.setItem("admin-notice", response.message)
+
+      localStorage.setItem("admin-auth-token", response.tokens.access)
+      localStorage.setItem("admin-refresh-token", response.tokens.refresh)
+      localStorage.setItem("admin-user", JSON.stringify(user))
+      localStorage.setItem("admin-notice", response.message)
       toast(response.message)
 
       if (!user.is_superuser && (user.role === "content_creator" || user.role === "content_manager")) {

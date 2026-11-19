@@ -30,7 +30,7 @@ export function Header({
     return false
   })
   const [user] = useState<StoredUser | null>(() => {
-    const value = sessionStorage.getItem("admin-user")
+    const value = sessionStorage.getItem("admin-user") || localStorage.getItem("admin-user")
     if (!value) return null
     try {
       return JSON.parse(value) as StoredUser

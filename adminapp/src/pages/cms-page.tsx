@@ -101,7 +101,7 @@ export function CMSPage() {
   const { toast } = useToast()
 
   // Stored User Info
-  const userString = sessionStorage.getItem("admin-user")
+  const userString = sessionStorage.getItem("admin-user") || localStorage.getItem("admin-user")
   const currentUser = userString ? JSON.parse(userString) : null
   const isManagerOrAdmin = currentUser?.is_superuser || currentUser?.role === "content_manager"
 
