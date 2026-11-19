@@ -8,6 +8,7 @@ import {
   Share2,
   Trophy,
   Sparkles,
+  FileText,
 } from "lucide-react"
 import { Header } from "@/components/dashboard/header"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -31,67 +32,6 @@ export type CMSArticle = {
   updated_at: string
   views?: number
 }
-
-const initialArticles: CMSArticle[] = [
-  {
-    id: 1,
-    title: "Introduction to Quantum Computing for High School Learners",
-    category: "Science & Tech",
-    author: "Jane ContentCreator",
-    status: "submitted",
-    updated_at: "2026-09-22",
-  },
-  {
-    id: 2,
-    title: "Interactive Mathematics: Solving Quadratic Equations Visually",
-    category: "Mathematics",
-    author: "Jane ContentCreator",
-    status: "draft",
-    updated_at: "2026-09-23",
-  },
-  {
-    id: 3,
-    title: "STEM Learning Milestones for 2026 - Official Parent Guide",
-    category: "Announcement",
-    author: "John ContentManager",
-    status: "published",
-    views: 1420,
-    updated_at: "2026-09-18",
-  },
-  {
-    id: 4,
-    title: "Understanding Artificial Intelligence in Everyday Life",
-    category: "Technology",
-    author: "Alice Writer",
-    status: "approved",
-    updated_at: "2026-09-21",
-  },
-  {
-    id: 5,
-    title: "Physics Experiments You Can Try at Home with Everyday Materials",
-    category: "Physics",
-    author: "Jane ContentCreator",
-    status: "rejected",
-    rejection_reason: "Needs higher resolution diagram images and safer procedure guidelines.",
-    updated_at: "2026-09-19",
-  },
-  {
-    id: 6,
-    title: "Space Exploration & Next-Gen Robotics in 2026",
-    category: "Technology",
-    author: "Alice Writer",
-    status: "approved",
-    updated_at: "2026-09-25",
-  },
-  {
-    id: 7,
-    title: "Monthly STEM Quiz Preparation & Challenge Pack",
-    category: "Science & Tech",
-    author: "Jane ContentCreator",
-    status: "draft",
-    updated_at: "2026-09-28",
-  },
-]
 
 type CMSTab = "all" | "reviews" | "published" | "calendar" | "states" | "feed_post" | "events" | "superheroes"
 
@@ -137,7 +77,21 @@ export function CMSPage() {
     else if (tab === "published") navigateTo("/cms/published")
     else navigateTo("/cms")
   }
-  const [articles, setArticles] = useState<CMSArticle[]>(initialArticles)
+  const [articles, setArticles] = useState<CMSArticle[]>(() => {
+    try {
+      const saved = localStorage.getItem("jl_cms_articles")
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+
+  const updateArticlesState = (updated: CMSArticle[]) => {
+    setArticles(updated)
+    try {
+      localStorage.setItem("jl_cms_articles", JSON.stringify(updated))
+    } catch {}
+  }
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
@@ -186,34 +140,34 @@ export function CMSPage() {
       status: "draft",
       updated_at: new Date().toISOString().split("T")[0],
     }
-    setArticles([newArt, ...articles])
+    updateArticlesState([newArt, ...articles])
     setCreateDialogOpen(false)
     toast("Draft article created successfully!")
   }
 
   const handleSubmitForReview = (id: number) => {
-    setArticles(
+    updateArticlesState(
       articles.map((a) => (a.id === id ? { ...a, status: "submitted" as const } : a))
     )
     toast("Article submitted for review.")
   }
 
   const handleApprove = (id: number) => {
-    setArticles(
+    updateArticlesState(
       articles.map((a) => (a.id === id ? { ...a, status: "approved" as const } : a))
     )
     toast("Article approved.")
   }
 
   const handlePublish = (id: number) => {
-    setArticles(
+    updateArticlesState(
       articles.map((a) => (a.id === id ? { ...a, status: "published" as const, views: 0 } : a))
     )
     toast("Article published live.")
   }
 
   const handleUnpublish = (id: number) => {
-    setArticles(
+    updateArticlesState(
       articles.map((a) => (a.id === id ? { ...a, status: "draft" as const } : a))
     )
     toast("Article moved back to drafts.")
@@ -227,7 +181,7 @@ export function CMSPage() {
 
   const handleConfirmReject = () => {
     if (!selectedArticleId) return
-    setArticles(
+    updateArticlesState(
       articles.map((a) =>
         a.id === selectedArticleId
           ? { ...a, status: "rejected" as const, rejection_reason: rejectionReason || "Needs revisions." }
@@ -560,8 +514,26 @@ export function CMSPage() {
 
                       {filteredArticles.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">
-                            No content items found.
+                          <td colSpan={5} className="px-5 py-12 text-center">
+                            <div className="mx-auto flex max-w-sm flex-col items-center justify-center">
+                              <div className="rounded-full bg-primary/10 p-3 text-primary mb-3">
+                                <FileText className="size-6" />
+                              </div>
+                              <p className="text-sm font-semibold text-foreground">No content items found</p>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {searchQuery || statusFilter !== "all"
+                                  ? "No articles matched your filter criteria."
+                                  : "Content Hub is currently empty (0 articles). Draft your first educational article or announcement to get started."}
+                              </p>
+                              <Button
+                                size="sm"
+                                onClick={() => setCreateDialogOpen(true)}
+                                className="mt-4 gap-1.5"
+                              >
+                                <Plus className="size-3.5" />
+                                Create article
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       )}
