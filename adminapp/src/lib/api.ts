@@ -1,4 +1,4 @@
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://api-staging.justlearning.in"
 
 function endpoint(path: string) {
   if (!apiBaseUrl) {
