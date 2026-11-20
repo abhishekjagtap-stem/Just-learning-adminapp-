@@ -15,7 +15,7 @@ export function DashboardPage() {
         <main className="flex-1 flex items-center justify-center p-6 sm:p-12 text-center">
           <div className="max-w-4xl space-y-4 animate-in fade-in zoom-in-95 duration-300">
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight uppercase bg-gradient-to-r from-purple-600 via-indigo-500 to-pink-500 bg-clip-text text-transparent leading-tight select-none">
-              dashboard will be obtained at last explore other pages MFS
+              dashboard will be obtained at last explore other pages.
             </h1>
           </div>
         </main>
